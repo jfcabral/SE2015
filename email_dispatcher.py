@@ -2,11 +2,7 @@ import json
 from time import sleep
 
 from email_management import send_email
-
-try:
-    from amazon_utilities import connect_emr, connect_ses, connect_s3, connect_sqs, create_get_queue, QUEUE_EMAIL_DISPATCH
-except ImportError:
-    from amazon_utilities_remote import connect_emr, connect_ses, connect_s3, connect_sqs, create_get_queue, QUEUE_EMAIL_DISPATCH
+from amazon_utilities import connect_emr, connect_ses, connect_s3, connect_sqs, create_get_queue, QUEUE_EMAIL_DISPATCH
 
 
 TIME_WAIT_FOR_MESSAGES = 20  # 20s is the maximum allowed by amazon

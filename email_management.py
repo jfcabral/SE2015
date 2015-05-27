@@ -1,10 +1,7 @@
 import time
 import boto.ses
 
-try:
-    from amazon_utilities import connect_ses
-except ImportError:
-    from amazon_utilities_remote import connect_ses
+from amazon_utilities import connect_ses
 
 EMAIL_SENDER = 'is.a2.2014.jm@gmail.com'
 
