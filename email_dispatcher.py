@@ -27,7 +27,7 @@ class EmailDispatcher:
             message = queue.read(wait_time_seconds=TIME_WAIT_FOR_MESSAGES)
 
             if message:
-                print 'nova mensagem!'  # TODO remover
+                print 'New Message!'
 
                 # get message content
                 body = message.get_body()

@@ -95,7 +95,8 @@ class Menu:
                          profile_data['sample_path'],
                          profile_data['reducer_file_path'],
                          self.user_email,
-                         output_dir)
+                         output_dir,
+                         self.conn_s3)
 
 
 if __name__ == '__main__':
