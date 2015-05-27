@@ -4,7 +4,7 @@ from boto.s3.connection import S3Connection
 from cluster_handler import Cluster
 #from email_management import send_email
 from upload_to_s3 import upload_map_reduce
-from amazon_utilities import request_job_notification, set_folder_public_simple, connect_s3
+from amazon_utilities import request_job_notification, connect_s3
 
 
 num_of_instances = 2
@@ -73,10 +73,6 @@ def mapreduce_to_work(cluster_handler, bucket_name, user_email, conn_s3=connect_
 def execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3):
     # we will only support 1 step per cluster at time
     step, downloadlink = create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, conn_s3)
-
-    if user_email:
-        # Make sure the link is accessible
-        set_folder_public_simple(downloadlink, conn_s3)
 
     # get a cluster (a existing cluster and active (True) or creating a new one)
     id_cluster = cluster_handler.input_select_create_cluster()

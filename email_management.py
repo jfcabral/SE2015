@@ -1,5 +1,4 @@
 import time
-import boto.ses
 
 from amazon_utilities import connect_ses
 
@@ -24,10 +23,11 @@ def send_email(email, step_data, conn_ses=connect_ses()):
     if verify_email(email, conn_ses):
 
         step_data['creation_date'] = step_data['creation_date'][:-8].replace("-", "/").replace("T", " ")
-        step_data['end_date'] = step_data['end_date'][:-8].replace("-", "/").replace("T", " ")
 
         # success case (has link)
         if 'link' in step_data:
+
+            step_data['end_date'] = step_data['end_date'][:-8].replace("-", "/").replace("T", " ")
 
             t = time.localtime(time.time())
             datetime = "%s/%s/%s %s:%s:%s" % (str(t.tm_mday), str(t.tm_mon), str(t.tm_year), str(t.tm_hour), str(t.tm_min), str(t.tm_sec))
@@ -92,7 +92,6 @@ def send_email(email, step_data, conn_ses=connect_ses()):
                     <p><b>Step name:</b> """ + step_data['step_name'] + "</p>\
                     <p><b>Status:</b> """ + step_data['status'] + "</p>\
                     <p><b>Started:</b> """ + step_data['creation_date'] + "</p>\
-                    <p><b>Finished:</b> """ + step_data['end_date'] + "</p>\
                 </body>\
             </html>\
             """
@@ -128,4 +127,3 @@ if __name__ == '__main__':
             'creation_date': '2015-05-26T22:09:00.213Z',
             'end_date': '2015-05-26T22:17:41.642Z'}
     send_email("marcocsp@hotmail.com", ret2)
-

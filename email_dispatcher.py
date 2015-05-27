@@ -2,7 +2,7 @@ import json
 from time import sleep
 
 from email_management import send_email
-from amazon_utilities import connect_emr, connect_ses, connect_s3, connect_sqs, create_get_queue, QUEUE_EMAIL_DISPATCH
+from amazon_utilities import connect_emr, connect_ses, connect_s3, connect_sqs, create_get_queue, set_folder_public_simple, QUEUE_EMAIL_DISPATCH
 
 
 TIME_WAIT_FOR_MESSAGES = 20  # 20s is the maximum allowed by amazon
@@ -54,6 +54,9 @@ class EmailDispatcher:
                 step_data = self.parse_step_info(elem['link'], step_info)
 
                 if step_data:
+                    # Make sure the link is accessible
+                    set_folder_public_simple(elem['link'], self.conn_s3)
+
                     send_email(elem['recipient'], step_data, self.conn_ses)
                     self.jobs.remove(elem)
 
@@ -73,8 +76,7 @@ class EmailDispatcher:
             ret = {'step_id': step_info.id,
                    'step_name': step_info.name,
                    'status': step_info.status.state,
-                   'creation_date': step_info.status.timeline.creationdatetime,
-                   'end_date': step_info.status.timeline.enddatetime}
+                   'creation_date': step_info.status.timeline.creationdatetime}
 
         return ret
 

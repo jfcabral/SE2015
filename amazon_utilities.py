@@ -79,7 +79,7 @@ def set_folder_public_simple(file_local_s3_path, conn=connect_s3()):
     bucket = conn.get_bucket(bucket_name)
     # adjust file_local_s3_path to remove s3://<bucket_name/ and get the file key in the s3_name bucket
     _tmp = file_local_s3_path[file_local_s3_path.find('output'):]
-    print _tmp
+    #print _tmp
 
     file_key = bucket.get_key(_tmp)
     if file_key:
