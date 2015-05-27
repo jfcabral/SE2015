@@ -54,8 +54,9 @@ class EmailDispatcher:
                 step_data = self.parse_step_info(elem['link'], step_info)
 
                 if step_data:
-                    # Make sure the link is accessible
-                    set_folder_public_simple(elem['link'], self.conn_s3)
+                    if step_info.status.state == 'COMPLETED':
+                        # Make sure the link is accessible
+                        set_folder_public_simple(elem['link'], self.conn_s3)
 
                     send_email(elem['recipient'], step_data, self.conn_ses)
                     self.jobs.remove(elem)
