@@ -79,16 +79,16 @@ class Menu:
             op = raw_input('Your option: ')
 
             ops = {'1': 'upload_input_data(bucket_name)',
-                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)',
-                   '3': 'self.handle_profiles(self.dynamo_handler, bucket_name)'}
+                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.mail_conn, self.conn_s3)',
+                   '3': 'self.handle_profiles(bucket_name)'}
 
             if op in ops:
                 eval(ops[op])
             else:
                 print 'Invalid option! Please, try again...'
 
-    def handle_profiles(self, dynamo_handler, bucket_name):
-        profile_data = dynamo_handler.list_input_profile()
+    def handle_profiles(self, bucket_name):
+        profile_data = self.dynamo_handler.list_input_profile()
         #print profile_data
 
         if profile_data:
