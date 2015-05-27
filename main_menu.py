@@ -79,7 +79,7 @@ class Menu:
             op = raw_input('Your option: ')
 
             ops = {'1': 'upload_input_data(bucket_name)',
-                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, user_email, self.mail_conn, self.conn_s3)',
+                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)',
                    '3': 'self.handle_profiles(self.dynamo_handler, bucket_name)'}
 
             if op in ops:
