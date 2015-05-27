@@ -99,7 +99,7 @@ def send_email(email, step_data, conn_ses=connect_ses()):
             # use the valid url to access the file in the specific bucket
             body = "Your MapReduce has failed! Please try again...\nStep ID: " + step_data[
                 'step_id'] + "\nStep name: " + step_data['step_name'] + "\nStatus: " + step_data[
-                'status'] + "\nStarted: " + step_data['creation_date'] + "\nFinished: " + step_data['end_date']
+                'status'] + "\nStarted: " + step_data['creation_date']
 
             conn_ses.send_email(EMAIL_SENDER, subject, body, email, html_body=html)
 
