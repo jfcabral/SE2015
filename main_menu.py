@@ -25,7 +25,7 @@ class Menu:
         self.conn_s3 = connect_s3()
 
         self.cluster_handler = Cluster(self.conn_emr)
-        #self.dynamo_handler = DynamoHandler()
+        self.dynamo_handler = DynamoHandler()
 
         self.user_email = None
 
