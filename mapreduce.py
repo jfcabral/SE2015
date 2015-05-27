@@ -64,7 +64,7 @@ def mapreduce_to_work(cluster_handler, bucket_name, user_email, conn_s3=connect_
     print "reducer: %s" % s3_reducer_dir
 
     input_dir = 's3://%s/input/' % bucket_name
-    output_dir = 's3://%s/output/' % bucket_name
+    output_dir = 's3://%s/output' % bucket_name
 
     execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3)
 

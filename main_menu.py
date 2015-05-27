@@ -86,7 +86,7 @@ class Menu:
         #print profile_data
 
         if profile_data:
-            output_dir = 's3://%s/output/' % bucket_name
+            output_dir = 's3://%s/output' % bucket_name
 
             # TODO resolver questão da selecão input folder! permitir escolher ou usar default (como esta)
             # TODO temporary hack until ^ is solved
