@@ -4,7 +4,7 @@ from boto.s3.connection import S3Connection
 from cluster_handler import Cluster
 #from email_management import send_email
 from upload_to_s3 import upload_map_reduce
-from amazon_utilities import request_job_notification, set_folder_public_simple
+from amazon_utilities import request_job_notification, set_folder_public_simple, connect_s3
 
 
 num_of_instances = 2
@@ -54,7 +54,7 @@ def aux_to_mapreduce_to_work(bucket, action, s3_name):
             print 'Invalid option! Please, try again...'
 
 
-def mapreduce_to_work(cluster_handler, bucket_name, user_email, mail_conn, conn_s3=S3Connection()):
+def mapreduce_to_work(cluster_handler, bucket_name, user_email, conn_s3=connect_s3()):
     # list all mapreduce options available (based on mapper folder)
     bucket = conn_s3.get_bucket(bucket_name)
 
@@ -69,7 +69,6 @@ def mapreduce_to_work(cluster_handler, bucket_name, user_email, mail_conn, conn_
     execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3)
 
 
-# todo: melhorar input
 # TODO selecionar input folder antes?
 def execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3):
     # we will only support 1 step per cluster at time

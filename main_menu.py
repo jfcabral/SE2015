@@ -1,19 +1,16 @@
 # coding=utf-8
-from ctypes.macholib.dyld import dyld_default_search
+
 import sys
 
 import boto.ses
-from boto.s3.connection import S3Connection
 
 from cluster_handler import Cluster
 from dynamo_handler import DynamoHandler
 from email_management import verify_email
 from upload_to_s3 import select_s3_bucket
-from amazon_utilities import connect_emr, connect_s3, set_folder_public
-
+from amazon_utilities import connect_emr, connect_s3
 from mapreduce import mapreduce_to_work, execute_step
-from upload_to_s3 import upload_input_data
-from email_management import send_email
+from upload_to_s3 import upload_input_data  # it is used
 
 
 class Menu:
@@ -51,9 +48,6 @@ class Menu:
 
         print "\n--------- Run simple task ---------"
 
-        # todo: remove/adjust this code to the 2nd milestone
-        # this piece of code belongs to our SES idea. It will be here to this milestone
-        # our architecture contemplates another flow
         self.user_email = raw_input("Please insert your email: ")
 
         mail_response = verify_email(self.user_email, self.conn_mail)
@@ -79,7 +73,7 @@ class Menu:
             op = raw_input('Your option: ')
 
             ops = {'1': 'upload_input_data(bucket_name)',
-                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.mail_conn, self.conn_s3)',
+                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)',
                    '3': 'self.handle_profiles(bucket_name)'}
 
             if op in ops:
