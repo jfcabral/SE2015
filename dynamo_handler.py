@@ -1,3 +1,4 @@
+from time import sleep
 from sys import exc_info, stderr
 
 from boto.dynamodb2.fields import HashKey, RangeKey
@@ -12,6 +13,7 @@ from boto.dynamodb2.layer1 import DynamoDBConnection
 #       * http://boto.readthedocs.org/en/latest/ref/dynamodb2.html
 class DynamoHandler:
     CREATE_TABLE_IF_MISSING = True
+    TABLE_CREATION_TIME = 30
     MAP_REDUCE_PROFILE_TABLE = 'map_reduce_profiles'
     MAP_REDUCE_PROFILE_SCHEMA = [HashKey('profile_name')]
     MAP_REDUCE_PROFILE_THROUGHPUT = {'read': 1, 'write': 1}
@@ -89,14 +91,20 @@ class DynamoHandler:
                                                'reducer_file_path': reducer_file_path})
 
     def configure_first_run(self):
-        print 'Creating new table to hold the Map Reduce Profiles'
+        print 'Creating a new table on Dynamo to save the Map Reduce Profiles. Please wait...'
         self.profiles_table = Table.create(DynamoHandler.MAP_REDUCE_PROFILE_TABLE,
                                            schema=DynamoHandler.MAP_REDUCE_PROFILE_SCHEMA,
                                            throughput=DynamoHandler.MAP_REDUCE_PROFILE_THROUGHPUT,
                                            connection=self.connection)
+
+        # wait until the table is created before populating it
+        sleep(self.TABLE_CREATION_TIME)
+
+        print 'Populating with default profiles'
+
         # Word Count profile
         base_path = 's3://eng-serv-teste3/'
-        handler.create_profile('Word Count',
+        self.create_profile('Word Count',
                                base_path + 'input/Word_Count',
                                base_path + 'scripts/WordCountMapper.py',
                                base_path + 'scripts/WordCountReducer2.py')
