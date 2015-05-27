@@ -26,7 +26,7 @@ def upload_input_data(s3_name, conn=S3Connection()):
     count = 0
     for localfile in files:
         if '\\' in localfile:
-            localfile.replace('\\', '/')
+            localfile = localfile.replace('\\', '/')
         k = Key(bucket)
         k.key = localfile
         print "Uploading %s to %s with key %s" % (localfile, s3_name, k.key)
