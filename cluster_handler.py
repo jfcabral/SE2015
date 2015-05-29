@@ -64,10 +64,13 @@ class Cluster:
                                                instance_groups=Cluster.DEFAULT_INSTANCE_GROUPS,
                                                job_flow_role='EMR_EC2_DefaultRole',
                                                service_role='EMR_DefaultRole',
+                                               action_on_failure='CANCEL_AND_WAIT',  # TODO careful! # should it be CANCEL_AND_WAIT?
                                                ami_version=Cluster.EMR_AMI_VERSION,
                                                hadoop_version=Cluster.EMR_HADOOP_VERSION,
-                                               action_on_failure='CONTINUE',  # TODO careful!
                                                keep_alive=True)
+
+        # Enabling the termination protection
+        self.conn_emr.set_termination_protection(cluster_id, True)
 
         if cluster_id:
             print 'Created cluster: ', cluster_id
@@ -79,6 +82,7 @@ class Cluster:
 
         if cluster:
             try:
+                self.conn_emr.set_termination_protection(cluster.id, False)
                 self.conn_emr.terminate_jobflow(cluster.id)
                 print 'Cluster %s was successfully terminated after %s normalized hours.' \
                       % (cluster.id, cluster.normalizedinstancehours)

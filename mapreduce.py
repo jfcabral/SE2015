@@ -130,6 +130,7 @@ def create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, conn_s3):
                          combiner=s3_reducer_dir,
                          input=input_dir,
                          output=outputlocation,
+                         action_on_failure='CONTINUE',
                          step_args=['-numReduceTasks', '1'])
 
     print "Step created: " + step_name
