@@ -69,8 +69,9 @@ def mapreduce_to_work(cluster_handler, bucket_name, user_email, conn_s3=connect_
     execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3)
 
 
-# TODO selecionar input folder antes?
+# TODO selecionar input folder antes? A TRATAR DISSO NESTE MOMENTO
 def execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3):
+
     # we will only support 1 step per cluster at time
     step, downloadlink = create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, conn_s3)
 
