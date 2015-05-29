@@ -48,38 +48,40 @@ class Menu:
 
         print "\n--------- Run simple task ---------"
 
-        self.user_email = raw_input("Please insert your email: ")
-
-        mail_response = verify_email(self.user_email, self.conn_mail)
-        if mail_response:
-            print "Your email already was kept here! :) Thank you!"
-        else:
-            print "AWS sent to you a confirmation email. Please confirm in your email account! ASAP! Thank you!\n"
+        if self.user_email is None:
+            self.user_email = raw_input("Please insert your email: ")
+            mail_response = verify_email(self.user_email, self.conn_mail)
+            if mail_response:
+                print "Your email already was kept here! :) Thank you!"
+            else:
+                print "AWS sent to you a confirmation email. Please confirm in your email account! ASAP! Thank you!\n"
 
         print "\nFirst you have to configure an s3 bucket for output"
         bucket_name = select_s3_bucket(self.conn_s3)
         print "\nBucket chosen: %s\n" % bucket_name
 
-        op = -1
+        if bucket_name is not None:
 
-        # TODO maybe improve
-        while op not in ['0', '1', '2', '3']:
-            print "This flow includes:"
-            print "\t1.\tUpload files to S3 Bucket\n" \
-                  "\t2.\tSelect or upload a MapReduce operation\n" \
-                  "\t3.\tSelect an existing Map-Reduce profile\n" \
-                  "\t0.\tMain Menu"
+            op = -1
 
-            op = raw_input('Your option: ')
+            # TODO maybe improve
+            while op != str(0):
+                print "This flow includes:"
+                print "\t1.\tUpload files to S3 Bucket\n" \
+                      "\t2.\tSelect or upload a MapReduce operation\n" \
+                      "\t3.\tSelect an existing Map-Reduce profile\n" \
+                      "\t0.\tMain Menu"
 
-            ops = {'1': 'upload_input_data(bucket_name)',
-                   '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)',
-                   '3': 'self.handle_profiles(bucket_name)'}
+                op = raw_input('Your option: ')
 
-            if op in ops:
-                eval(ops[op])
-            else:
-                print 'Invalid option! Please, try again...'
+                ops = {'1': 'upload_input_data(bucket_name)',
+                       '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)',
+                       '3': 'self.handle_profiles(bucket_name)'}
+
+                if op in ops:
+                    eval(ops[op])
+                elif op != str(0):
+                    print 'Invalid option! Please, try again...'
 
     def handle_profiles(self, bucket_name):
         profile_data = self.dynamo_handler.list_input_profile()

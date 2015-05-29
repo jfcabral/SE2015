@@ -79,22 +79,24 @@ def select_s3_bucket(conn=S3Connection()):
 
     data = {}
     op = 1
-    while op not in data:
+    while op != str(0):
         count = 1
         print "\nAvailable buckets in your account"
         for bucket in buckets:
             data[str(count)] = bucket.name
             print "\t%d.\t%s" % (count, bucket.name)
             count += 1
-        print "\t0.\tCreate new bucket (name must be unique)"
+        print "\t%d.\tCreate new bucket (name must be unique)" % count
+        print "\t0.\tMain Menu"
 
         op = raw_input("Your option: ")
+        op = op.strip()
 
         if op in data:          # return a existing bucket
             return data[op]
-        elif op == str(0):
+        elif op == str(count):
             return create_new_bucket(conn)
-        else:
+        elif op != str(0):
             print 'Invalid option! Please, try again...'
 
 
