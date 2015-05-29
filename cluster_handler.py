@@ -288,7 +288,7 @@ class Cluster:
                                 print "\nReport for instances type of %s cluster" % out.clusters[int(op)].name
                                 print "%d MASTER" % master_count
                                 print "%d CORE" % core_count
-                                print "%d TASK\n" % task_count
+                                print "%d TASK" % task_count
                                 control = False
 
         return out.clusters
