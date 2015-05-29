@@ -10,6 +10,7 @@ from email_management import verify_email
 from upload_to_s3 import select_s3_bucket
 from amazon_utilities import connect_emr, connect_s3
 from mapreduce import mapreduce_to_work, execute_step
+from validate_email import validate_email
 from upload_to_s3 import upload_input_data  # it is used
 
 
@@ -49,7 +50,14 @@ class Menu:
         print "\n--------- Run simple task ---------"
 
         if self.user_email is None:
-            self.user_email = raw_input("Please insert your email: ")
+
+            is_valid = False
+            while is_valid == False:
+                self.user_email = raw_input("Please insert your email: ")
+                is_valid = validate_email(self.user_email)
+                if not is_valid:
+                    print ("Invalid email! Please try again\n")
+
             mail_response = verify_email(self.user_email, self.conn_mail)
             if mail_response:
                 print "Your email already was kept here! :) Thank you!"
