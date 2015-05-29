@@ -108,7 +108,7 @@ class Cluster:
         cluster_list = self.list_clusters(False, True)
         index_create_new_cluster = len(cluster_list)
 
-        print '--------------------------------\n\t%d.\tCreate new Cluster' %index_create_new_cluster
+        print '--------------------------------\n\t%d.\tCreate new Cluster' % index_create_new_cluster
 
         while True:
             try:
@@ -235,6 +235,10 @@ class Cluster:
 
         return ret
 
+    def list_instances(self, cluster):
+        temp = self.conn_emr.list_instances(cluster.id)
+        print temp
+
     def list_clusters(self, all_states=False, silent=False):
         if all_states:
             out = self.conn_emr.list_clusters(cluster_states=ALL_CLUSTER_STATES)
@@ -250,14 +254,48 @@ class Cluster:
             for cluster in out.clusters:
                 print '%d:\n\tID:\t%s\n\tName:\t%s\n\tStatus:\t%s\n--------------------------------\n' \
                       % (i, cluster.id, cluster.name, cluster.status.state)
-
                 i += 1
+
+                op = -1
+                control = True
+                while control:
+                    if not all_states:
+                        op = raw_input("Please select the cluster id, in order to analyze the instances "
+                                       "(if it is not in range, you'll go back to previous menu): ")
+                        op = op.strip()
+
+                        try:
+                            int(op)
+                        except ValueError:
+                            control = False
+                            print "Invalid selection! You are going back to previous menu!"
+                        else:
+                            if int(op) > - 1 and int(op) < i:
+                                # select the group of instances of the selected cluster
+                                instances = self.conn_emr.list_instance_groups(out.clusters[int(op)].id)
+
+                                master_count = 0
+                                core_count = 0
+                                task_count = 0
+                                for instance in instances.instancegroups:
+                                    if instance.instancegrouptype in "MASTER":
+                                        master_count += 1
+                                    elif instance.instancegrouptype in "CORE":
+                                        core_count += 1
+                                    elif instance.instancegrouptype in "TASK":
+                                        task_count += 1
+
+                                print "\nReport for instances type of %s cluster" % out.clusters[int(op)].name
+                                print "%d MASTER" % master_count
+                                print "%d CORE" % core_count
+                                print "%d TASK\n" % task_count
+                                control = False
 
         return out.clusters
 
 
 if __name__ == '__main__':
     from boto.emr.connection import EmrConnection
-    #input_select_cluster(EmrConnection())
+    # input_select_cluster(EmrConnection())
     #cluster_menu(EmrConnection())
     Cluster().menu()
