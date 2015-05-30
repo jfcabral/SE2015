@@ -3,14 +3,14 @@
 import sys
 
 import boto.ses
-
+import re
 from cluster_handler import Cluster
 from dynamo_handler import DynamoHandler
 from email_management import verify_email
 from upload_to_s3 import select_s3_bucket
 from amazon_utilities import connect_emr, connect_s3
 from mapreduce import mapreduce_to_work, execute_step
-from validate_email import validate_email
+
 from upload_to_s3 import upload_input_data  # it is used
 
 
@@ -51,11 +51,13 @@ class Menu:
 
         if self.user_email is None:
 
-            is_valid = False
-            while is_valid == False:
+            is_valid = None
+            while is_valid is None:
                 self.user_email = raw_input("Please insert your email: ")
-                is_valid = validate_email(self.user_email)
-                if not is_valid:
+                is_valid = re.match('\w+[.|\w]\w+@\w+[.]\w+[.|\w+]\w+', self.user_email)
+
+                # is_valid = validate_email(self.user_email)
+                if is_valid is None:
                     print ("Invalid email! Please try again\n")
 
             mail_response = verify_email(self.user_email, self.conn_mail)

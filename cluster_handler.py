@@ -285,7 +285,7 @@ class Cluster:
                                     elif instance.instancegrouptype in "TASK":
                                         task_count += 1
 
-                                print "\nReport for instances type of %s cluster" % out.clusters[int(op)].name
+                                print "\nReport for instances type of %s cluster:" % out.clusters[int(op)].name
                                 print "%d MASTER" % master_count
                                 print "%d CORE" % core_count
                                 print "%d TASK" % task_count
