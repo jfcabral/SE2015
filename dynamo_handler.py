@@ -3,8 +3,8 @@ from sys import exc_info, stderr
 
 from boto.dynamodb2.fields import HashKey, RangeKey
 from boto.dynamodb2.table import Table
-from boto.dynamodb2.exceptions import JSONResponseError
 from boto.dynamodb2.layer1 import DynamoDBConnection
+from boto.dynamodb2.exceptions import JSONResponseError, ItemNotFound
 
 
 # This class aims to encapsulate the operations with Amazon NoSQL Engine: Dynamo DB v2
@@ -27,12 +27,20 @@ class DynamoHandler:
                                     throughput=DynamoHandler.MAP_REDUCE_PROFILE_THROUGHPUT,
                                     connection=self.connection)
 
-        if DynamoHandler.CREATE_TABLE_IF_MISSING:
+        """if DynamoHandler.CREATE_TABLE_IF_MISSING:
             try:
                 self.profiles_table.describe()
             except JSONResponseError:
                 if exc_info()[1].error_code == 'ResourceNotFoundException':
-                    self.configure_first_run()
+                    self.configure_first_run()"""
+
+    def check_create_table(self):
+        try:
+            self.profiles_table.describe()
+            print '\tMap-Reduce dynamo db already exists'
+        except JSONResponseError:
+            if exc_info()[1].error_code == 'ResourceNotFoundException':
+                self.create_table()
 
     def get_all_profile_names(self):
         ret = None
@@ -64,12 +72,21 @@ class DynamoHandler:
                 if option == 0:
                     break
                 elif 0 < option <= len(profiles):
-                    ret = self.get_profile_data(elem)
+                    ret = self.get_profile_data(profiles[option-1])
                 else:
                     print >> stderr, 'Invalid Option!'
 
             except ValueError:
                 print >> stderr, 'Invalid option'
+
+        return ret
+
+    def check_if_profile_exists(self, profile_name):
+        try:
+            self.profiles_table.get_item(profile_name=profile_name)
+            ret = True
+        except ItemNotFound:
+            ret = False
 
         return ret
 
@@ -90,12 +107,15 @@ class DynamoHandler:
                                                'mapper_file_path': mapper_file_path,
                                                'reducer_file_path': reducer_file_path})
 
-    def configure_first_run(self):
-        print 'Creating a new table on Dynamo to save the Map Reduce Profiles. Please wait...'
+    def create_table(self):
+        print '\tCreating a new table on Dynamo to save the Map Reduce Profiles. Please wait...'
         self.profiles_table = Table.create(DynamoHandler.MAP_REDUCE_PROFILE_TABLE,
                                            schema=DynamoHandler.MAP_REDUCE_PROFILE_SCHEMA,
                                            throughput=DynamoHandler.MAP_REDUCE_PROFILE_THROUGHPUT,
                                            connection=self.connection)
+
+    def configure_first_run(self):
+        self.create_table()
 
         # wait until the table is created before populating it
         sleep(self.TABLE_CREATION_TIME)

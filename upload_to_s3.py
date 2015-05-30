@@ -100,6 +100,32 @@ def select_s3_bucket(conn=S3Connection()):
             print 'Invalid option! Please, try again...'
 
 
+def select_s3_bucket2(conn=S3Connection()):
+    buckets = conn.get_all_buckets()
+
+    data = {}
+    op = 1
+    while op != str(0):
+        count = 1
+        print "\nAvailable buckets in your account"
+        for bucket in buckets:
+            data[str(count)] = bucket.name
+            print "\t%d.\t%s" % (count, bucket.name)
+            count += 1
+        print "\t%d.\tCreate new bucket (name must be unique)" % count
+        print "\t0.\tMain Menu"
+
+        op = raw_input("Your option: ")
+        op = op.strip()
+
+        if op in data:          # return a existing bucket
+            return buckets[int(op)-1]
+        elif op == str(count):
+            return create_new_bucket(conn)
+        elif op != str(0):
+            print 'Invalid option! Please, try again...'
+
+
 def create_new_bucket(conn=S3Connection()):
     # the new bucket will include a timestamp to try to assure a unique name to the new s3 bucket
     t = localtime(time())

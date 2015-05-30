@@ -66,13 +66,13 @@ def mapreduce_to_work(cluster_handler, bucket_name, user_email, conn_s3=connect_
     input_dir = 's3://%s/input/' % bucket_name
     output_dir = 's3://%s/output' % bucket_name
 
-    execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3)
+    execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir)
 
 
-def execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, conn_s3):
+def execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user_email, output_dir, s3_combiner_dir=None):
 
     # we will only support 1 step per cluster at time
-    step, downloadlink = create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, conn_s3)
+    step, downloadlink = create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, s3_combiner_dir)
 
     # get a cluster (a existing cluster and active (True) or creating a new one)
     id_cluster = cluster_handler.input_select_create_cluster()
@@ -114,7 +114,7 @@ def execute_step(cluster_handler, s3_mapper_dir, input_dir, s3_reducer_dir, user
 
 # The input and output locations are default
 # It includes the directories of mapper and reducer, selected by user
-def create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, conn_s3):
+def create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, s3_combiner_dir):
 
     step_name = raw_input("\nGive a name to your step: ")
 
@@ -124,10 +124,16 @@ def create_step(s3_mapper_dir, s3_reducer_dir, input_dir, output_dir, conn_s3):
 
     print "Creating %s step..." % step_name
 
+    if s3_combiner_dir:
+        combiner = s3_combiner_dir
+
+    else:
+        combiner = s3_reducer_dir
+
     step = StreamingStep(name=step_name,
                          mapper=s3_mapper_dir,
                          reducer=s3_reducer_dir,
-                         combiner=s3_reducer_dir,
+                         combiner=combiner,
                          input=input_dir,
                          output=outputlocation,
                          action_on_failure='CONTINUE',

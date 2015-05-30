@@ -8,6 +8,7 @@ import boto.sns
 import boto.ses
 import boto.emr
 import boto.s3
+import boto.beanstalk
 from boto.sqs.message import Message
 
 REGION = 'us-east-1'
@@ -101,6 +102,11 @@ def connect_ses(region=REGION):
 # <----------------------- Elastic Map Reduce (EMR) ----------------------->
 def connect_emr(region=REGION):
     return boto.emr.connect_to_region(region)
+
+
+# <----------------------- Elastic Beanstalk ----------------------->
+def connect_beanstalk(region=REGION):
+    return boto.beanstalk.connect_to_region(region)
 
 
 # for tests only:

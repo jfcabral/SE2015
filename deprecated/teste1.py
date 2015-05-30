@@ -36,8 +36,8 @@ wc_step = StreamingStep(name = 'wc text',
 #num_instances, role, type, market, name,
 instance_groups = [
     InstanceGroup(1, 'MASTER', 'm1.small', 'ON_DEMAND', 'Master'),
-    InstanceGroup(1, 'CORE', 'm1.small', 'ON_DEMAND', 'Core'),
-    InstanceGroup(2, 'TASK', 'm1.small', 'ON_DEMAND', 'Task')
+    #InstanceGroup(1, 'TASK', 'm1.small', 'ON_DEMAND', 'Task'),
+    InstanceGroup(1, 'CORE', 'm1.small', 'ON_DEMAND', 'Core')
 ]
 
 jf_id = emr.run_jobflow(log_uri='s3://%s/logs' %(bucket_name),

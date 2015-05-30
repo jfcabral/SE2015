@@ -100,15 +100,29 @@ class Menu:
         if profile_data:
             output_dir = 's3://%s/output' % bucket_name
 
-            # TODO resolver questão da selecão input folder! permitir escolher ou usar default (como esta)
-            # TODO temporary hack until ^ is solved
-            execute_step(self.cluster_handler,
-                         profile_data['mapper_file_path'],
-                         profile_data['sample_path'],
-                         profile_data['reducer_file_path'],
-                         self.user_email,
-                         output_dir,
-                         self.conn_s3)
+            #input_dir = self.choose_input_dir()
+
+            if 'combiner_file_path' in profile_data:
+
+                # TODO resolver questão da selecão input folder! permitir escolher ou usar default (como esta)
+                # TODO temporary hack until ^ is solved
+                execute_step(self.cluster_handler,
+                             profile_data['mapper_file_path'],
+                             profile_data['sample_path'],
+                             profile_data['reducer_file_path'],
+                             self.user_email,
+                             output_dir,
+                             profile_data['combiner_file_path'])
+            else:
+                execute_step(self.cluster_handler,
+                             profile_data['mapper_file_path'],
+                             profile_data['sample_path'],
+                             profile_data['reducer_file_path'],
+                             self.user_email,
+                             output_dir)
+
+    def choose_input_dir(self, sample_dir):
+        print 'Choose the input folder:\n1 - Use profile sample\n2 - '
 
 
 if __name__ == '__main__':
