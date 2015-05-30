@@ -1,0 +1,23 @@
+FROM ubuntu:14.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    python2.7 \
+    python-pip
+
+RUN pip install boto 
+
+# Setup environment variables for boto
+ENV AWS_ACCESS_KEY_ID <key>
+ENV AWS_SECRET_ACCESS_KEY <secret>
+
+# Install app
+RUN wget -nv https://www.dropbox.com/s/a8ldvxxfqjc4nlm/email_management.py
+RUN wget -nv https://www.dropbox.com/s/4qkmjb4hzfs1dji/email_dispatcher.py
+RUN wget -nv https://www.dropbox.com/s/iucesut8qxx414l/amazon_utilities.py
+
+# Allow traffic through port 80
+EXPOSE 80
+
+CMD ["python","email_dispatcher.py"]
