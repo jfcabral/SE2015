@@ -66,7 +66,7 @@ def upload_dynamo_profiles(handler):
     print 'Uploadind data, please wait...'
 
     # upload inputs
-    inp = listdir(MAP_REDUCE_INPUTS)
+    inp = [elem for elem in listdir(MAP_REDUCE_INPUTS) if not elem.startswith('.')]
     for elem in inp:
         upload_folder(bucket, '%s%s/' % (MAP_REDUCE_INPUTS, elem))
 
