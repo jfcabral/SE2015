@@ -9,68 +9,101 @@ from os import remove
 # upload every files inside local input folder. (Delete them (locally) after the upload - not at the moment)
 def upload_input_data(s3_name, conn=S3Connection()):
 
-    input_directory = select_input_directory(s3_name)
+    # select the input directory to upload files. At the moment it is in stand-by
+    # input_directory = select_input_directory(s3_name)
 
-    print
-    raw_input("Press enter to start the flow...(do not forget to populate the local input folder)\n")
-
-    # print "Connecting to S3 (Bucket: %s)..." % s3_name
     # conn = S3Connection()
     bucket = conn.get_bucket(s3_name)
 
-    print
-    raw_input("Press enter to transfer files from input folder to S3...\n")
+    # all files from local data folder
+    path = 'data/*/'
+    localfolders = glob.glob(path)
 
-    # all files from local input folder
-    path = 'input/*'
-    files = glob.glob(path)
+    op = -1
+    while op != str(0):
+        count = 1
+        print "\nUpload input files to S3 Bucket:"
+        # It selects and shows the local folders inside 'data' folder (1st level only)
+        for localfolder in localfolders:
+            print "\t%d.\t%s" % (count, localfolder[5:-1])
+            count += 1
+        print "\t0.\tPrevious Menu"
+        op = raw_input("Please select the folder to upload your input data to MapReduce operation: ")
 
-    count = 0
-    for localfile in files:
-        bucketfile = localfile[:6] + input_directory + "/" + localfile[6:]
-        if '\\' in localfile:
-            localfile = localfile.replace('\\', '/')
-        k = bucket.new_key(bucketfile)
-        print "Uploading %s to %s with key %s" % (localfile, s3_name, k.key)
-        k.set_contents_from_filename(localfile)
-        # print "Removing %s from local input folder" % localfile
-        # remove(localfile)
-        count += 1
+        try:
+            int(op)
+        except ValueError:
+            print "Invalid operation. Try again..."
+        else:
+            if 0 < int(op) < count:
+                # upload all the files inside the selected localfolder to the selected S3 bucket
+                selectedfolder = glob.glob(localfolders[int(op)-1]+ "input/*")
+                upcount = 1
+                for files in selectedfolder:
+                    lastpositonofslash = files.rfind('/')
+                    bucketfile = "input/" + localfolders[int(op)-1][5:-1] + files[lastpositonofslash:]
+                    # in order to avoid the windows-style
+                    if '\\' in files:
+                        files = files.replace('\\', '/')
+                    k = bucket.new_key(bucketfile)
+                    print "uploading %s to %s..." % (files, bucketfile)
+                    k.set_contents_from_filename(files)
+                    upcount += 1
+                    break
 
-    print "%d files uploaded to %s S3Bucket" % (count, s3_name)
+                    print "%d files uploaded to %s bucket!" % (upcount-1, s3_name)
+                else:
+                    break
 
 
 # todo: ainda nao tem qualquer proteccao
+# todo: diferenciar melhor o map do reduce
 # action = mapper OR reducer
-def upload_map_reduce(action, s3_name, conn=S3Connection()):
+def upload_map_reduce(s3_name, conn=S3Connection()):
 
     # print "\n------Connecting to S3 (Bucket: %s)...-----" % s3_name
     bucket = conn.get_bucket(s3_name)
 
     # all files from local folder
-    path = action + '/*'
+    path = 'data/*/'
     files = glob.glob(path)
 
     data = {}
-    op = 1
+    op = -1
     while op not in data:
         count = 1
-        for localfile in files:
-            data[str(count)] = localfile
-            print "\t%d.\t%s" % (count, localfile)
+        print "\nUpload MapReduce scripts to S3 Bucket:"
+        # It selects and shows the local folders inside 'data' folder (1st level only)
+        for file in files:
+            print "\t%d.\t%s" % (count, file[5:-1])
             count += 1
+        print "\t0.\tPrevious Menu"
 
-        op = raw_input("Please select a " + action + " inside " + action + " folder: ")
-        # add the new file in s3 bucket
-        if op in data:
-            file_name = data[op].replace('\\', '/')
+        op = raw_input("Please select the folder to upload your MapReduce scripts: ")
 
-            k = Key(bucket)
-            k.key = file_name
-            k.set_contents_from_filename(file_name)
-            return "s3://%s/%s" % (s3_name, file_name)
+        try:
+            int(op)
+        except ValueError:
+            print "Invalid operation. Try again..."
         else:
-            print 'Invalid option! Please, try again...'
+            if 0 < int(op) < count:
+                # upload all the files inside the selected localfolder to the selected S3 bucket
+                selectedfolder = glob.glob(files[int(op)-1] + "scripts/*")
+                upcount = 1
+                for file in selectedfolder:
+                    lastpositonofslash = file.rfind('/')
+                    bucketfile = "scripts/" + files[int(op)-1][5:-1] + file[lastpositonofslash:]
+                    # in order to avoid the windows-style
+                    if '\\' in file:
+                        file = file.replace('\\', '/')
+                    k = bucket.new_key(bucketfile)
+                    print "uploading %s to %s..." % (file, bucketfile)
+                    k.set_contents_from_filename(file)
+                    upcount += 1
+                break
+                print "%d scripts uploaded to %s bucket!" % (upcount-1, s3_name)
+            else:
+                break
 
 
 # todo: sem proteccoes e sem retorno sem um bucket definido atm

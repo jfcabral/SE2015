@@ -11,6 +11,7 @@ from upload_to_s3 import select_s3_bucket
 from amazon_utilities import connect_emr, connect_s3
 from mapreduce import mapreduce_to_work, execute_step
 
+from upload_to_s3 import upload_map_reduce
 from upload_to_s3 import upload_input_data  # it is used
 
 
@@ -73,20 +74,18 @@ class Menu:
         if bucket_name is not None:
 
             op = -1
-
-            # TODO maybe improve
             while op != str(0):
                 print "This flow includes:"
-                print "\t1.\tUpload files to S3 Bucket\n" \
-                      "\t2.\tSelect or upload a MapReduce operation\n" \
-                      "\t3.\tSelect an existing Map-Reduce profile\n" \
+                print "\t1.\tUpload data\n" \
+                      "\t2.\tSelect an existing Map-Reduce profile\n" \
+                      "\t3.\tMapReduce something\n" \
                       "\t0.\tMain Menu"
 
                 op = raw_input('Your option: ')
 
-                ops = {'1': 'upload_input_data(bucket_name)',
-                       '2': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)',
-                       '3': 'self.handle_profiles(bucket_name)'}
+                ops = {'1': 'self.upload_data(bucket_name)',
+                       '2': 'self.handle_profiles(bucket_name)',
+                       '3': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)'}
 
                 if op in ops:
                     eval(ops[op])
@@ -95,7 +94,7 @@ class Menu:
 
     def handle_profiles(self, bucket_name):
         profile_data = self.dynamo_handler.list_input_profile()
-        #print profile_data
+        # print profile_data
 
         if profile_data:
             output_dir = 's3://%s/output' % bucket_name
@@ -123,6 +122,31 @@ class Menu:
 
     def choose_input_dir(self, sample_dir):
         print 'Choose the input folder:\n1 - Use profile sample\n2 - '
+
+    def upload_data(self, bucket_name):
+
+        op = -1
+        while op != str(0):
+            print "\nUpload data to S3 Bucket:"
+            print "\t1.\tUpload input files\n" \
+                  "\t2.\tUpload MapReduce scripts\n" \
+                  "\t0.\tMain Menu"
+
+            op = raw_input('Your option: ')
+
+            try:
+                int(op)
+            except ValueError:
+                print "Invalid operation. Try again..."
+            else:
+                ops = {'1': 'upload_input_data(bucket_name)',
+                       '2': 'upload_map_reduce(bucket_name, self.conn_s3)',
+                       '3': 'mapreduce_to_work(self.cluster_handler, bucket_name, self.user_email, self.conn_s3)'}
+
+                if op in ops:
+                    eval(ops[op])
+                elif op != str(0):
+                    print 'Invalid option! Please, try again...'
 
 
 if __name__ == '__main__':
