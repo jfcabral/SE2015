@@ -28,7 +28,7 @@ class Cluster:
     def menu(self):
         op = -1
         while op != 0:
-            print "\n---------- Clusters ----------"
+            print "\n---------- Cluster Menu ----------"
             print "1.\tList Active Clusters\n" \
                   "2.\tList All Clusters\n" \
                   "3.\tCreate Cluster\n" \
@@ -254,7 +254,7 @@ class Cluster:
                 print 'No clusters found / available for the selected option.'
         else:
             i = 0
-            print "---------- Clusters ----------\n"
+            print "\n---------- Clusters ----------\n"
             for cluster in out.clusters:
                 instances = self.conn_emr.list_instance_groups(cluster.id)
 

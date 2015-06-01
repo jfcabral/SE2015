@@ -63,7 +63,7 @@ class Menu:
 
             mail_response = verify_email(self.user_email, self.conn_mail)
             if mail_response:
-                print "Your email already was kept here! :) Thank you!"
+                print "Your email is already good to go! :)"
             else:
                 print "AWS sent to you a confirmation email. Please confirm in your email account! ASAP! Thank you!\n"
 

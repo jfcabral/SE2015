@@ -112,28 +112,31 @@ def select_input(bucket):
 def aux_to_mapreduce_to_work(bucket, action, s3_name):
 
     options = list(bucket.list("scripts/", "/"))
-    op = -1
-    data = {}
-    while op != str(0):
-        count = 1
-        print "\nTheme to select a %s operation:" % action
-        for key in options:
-            if key.name.count('/') == 2:
-                print "\t%d.\t%s" % (count, key.name[8:key.name.rfind('/')])
-                data[str(count)] = key.name[8:key.name.rfind('/')]
-                count += 1
+    if options and len(options) > 0:
+        op = -1
+        data = {}
+        while op != str(0):
+            count = 1
+            print "\nTheme to select a %s operation:" % action
+            for key in options:
+                if key.name.count('/') == 2:
+                    print "\t%d.\t%s" % (count, key.name[8:key.name.rfind('/')])
+                    data[str(count)] = key.name[8:key.name.rfind('/')]
+                    count += 1
 
-        op = raw_input("Your option: ")
+            op = raw_input("Your option: ")
 
-        try:
-            int(op)
-        except ValueError:
-            print "Invalid operation. Try again..."
-        else:
-            if 0 < int(op) < count:
-                return "s3://%s/%s" % (s3_name, list_and_select_script(bucket, action, data[op]))
-            else:
+            try:
+                int(op)
+            except ValueError:
                 print "Invalid operation. Try again..."
+            else:
+                if 0 < int(op) < count:
+                    return "s3://%s/%s" % (s3_name, list_and_select_script(bucket, action, data[op]))
+                else:
+                    print "Invalid operation. Try again..."
+    else:
+        print 'No Themes available :( Please upload them first'
 
 
 def mapreduce_to_work(cluster_handler, bucket_name, user_email, conn_s3=connect_s3()):
