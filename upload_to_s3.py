@@ -40,11 +40,13 @@ def upload_input_data(s3_name, conn=S3Connection()):
                 selectedfolder = glob.glob(localfolders[int(op)-1]+ "input/*")
                 upcount = 1
                 for files in selectedfolder:
-                    lastpositonofslash = files.rfind('/')
-                    bucketfile = "input/" + localfolders[int(op)-1][5:-1] + files[lastpositonofslash:]
-                    # in order to avoid the windows-style
+                   # in order to avoid the windows-style
                     if '\\' in files:
                         files = files.replace('\\', '/')
+
+                    lastpositonofslash = files.rfind('/')
+                    bucketfile = "input/" + localfolders[int(op)-1][5:-1] + files[lastpositonofslash:]
+
                     k = bucket.new_key(bucketfile)
                     print "uploading %s to %s..." % (files, bucketfile)
                     k.set_contents_from_filename(files)
@@ -91,11 +93,13 @@ def upload_map_reduce(s3_name, conn=S3Connection()):
                 selectedfolder = glob.glob(files[int(op)-1] + "scripts/*")
                 upcount = 1
                 for file in selectedfolder:
-                    lastpositonofslash = file.rfind('/')
-                    bucketfile = "scripts/" + files[int(op)-1][5:-1] + file[lastpositonofslash:]
                     # in order to avoid the windows-style
                     if '\\' in file:
                         file = file.replace('\\', '/')
+
+                    lastpositonofslash = file.rfind('/')
+                    bucketfile = "scripts/" + files[int(op)-1][5:-1] + file[lastpositonofslash:]
+
                     k = bucket.new_key(bucketfile)
                     print "uploading %s to %s..." % (file, bucketfile)
                     k.set_contents_from_filename(file)
