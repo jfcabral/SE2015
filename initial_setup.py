@@ -1,10 +1,9 @@
 from os import listdir
 from time import sleep
+from os.path import isdir
 
-from boto.s3.key import Key
 
-
-from upload_to_s3 import select_s3_bucket, select_s3_bucket2
+from upload_to_s3 import select_s3_bucket2
 from amazon_utilities import connect_s3, connect_beanstalk
 from dynamo_handler import DynamoHandler
 
@@ -12,8 +11,8 @@ from dynamo_handler import DynamoHandler
 BEANSTALK_APP_NAME = 'email-dispatcher-app'
 BEANSTALK_TEMPLATE = 'email_dispatcher'
 
-MAP_REDUCE_PROFILES = './scripts/'
-MAP_REDUCE_INPUTS = './input/'
+
+MAP_REDUCE_DATA = './data/'
 SLEEP_TIME_BEFORE_POPULATING_PROFILES = 5
 
 
@@ -48,11 +47,16 @@ def setup_dynamo_db():
     return handler
 
 
-def upload_folder(bucket, folder):
-    scripts = listdir(folder)
-    for elem in scripts:
-        k = bucket.new_key(folder[2:] + elem)
-        k.set_contents_from_filename(folder + elem)
+def upload_folder_rec(bucket, folder):
+    contents = listdir(folder)
+    for elem in contents:
+        path = '%s/%s' % (folder, elem)
+
+        if isdir(path):
+            upload_folder_rec(bucket, path)
+        else:
+            k = bucket.new_key('%s/%s' %(folder[2:], elem))
+            k.set_contents_from_filename(path)
 
 
 def upload_dynamo_profiles(handler):
@@ -63,24 +67,20 @@ def upload_dynamo_profiles(handler):
     # select a bucket
     bucket = select_s3_bucket2(conn_s3)
 
-    print 'Uploadind data, please wait...'
+    print 'Uploading data, please wait...'
 
-    # upload inputs
-    inp = [elem for elem in listdir(MAP_REDUCE_INPUTS) if not elem.startswith('.')]
-    for elem in inp:
-        upload_folder(bucket, '%s%s/' % (MAP_REDUCE_INPUTS, elem))
-
-    # upload scripts
-    upload_folder(bucket, MAP_REDUCE_PROFILES)
+    # Upload Map Reduce data (inputs / scripts
+    upload_folder_rec(bucket, MAP_REDUCE_DATA)
 
     # check profile existence
-    if not handler.check_if_profile_exists('Word Count'):
+    profile_name = 'Word Count'
+    if not handler.check_if_profile_exists(profile_name):
         print '\nDynamo Profiles\n\tPopulating with Word Count'
-        base_path = 's3://%s/' % bucket.name
+        base_path = 's3://%s/%s/%s/' % (bucket.name, MAP_REDUCE_DATA[2:], profile_name.replace(' ', '_'))
 
         # Word Count profile
-        handler.create_profile('Word Count',
-                               base_path + 'input/Word_Count',
+        handler.create_profile(profile_name,
+                               base_path + 'input/',
                                base_path + 'scripts/WordCountMapper.py',
                                base_path + 'scripts/WordCountReducer.py')
 
@@ -90,7 +90,7 @@ def upload_dynamo_profiles(handler):
 
         # Word Count profile
         handler.create_profile('IN',
-                               base_path + 'input/IN',
+                               base_path + 'input/',
                                base_path + 'scripts/IN_Mapper.py',
                                base_path + 'scripts/IN_Reducer.py',
                                base_path + 'scripts/IN_Combiner.py')"""
