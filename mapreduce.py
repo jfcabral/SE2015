@@ -101,7 +101,7 @@ def select_input(bucket):
                         print "Invalid operation. Try again..."
                     else:
                         if 0 < int(opt) <= count:
-                            return files[int(opt)-1].name
+                            return files[int(opt)].name
                         else:
                             print "Invalid operation. Try again..."
 
