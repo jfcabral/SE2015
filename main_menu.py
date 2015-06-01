@@ -31,8 +31,8 @@ class Menu:
     def main_menu(self):
         op = -1
         while op != '0':
-            print "\nWelcome to Services Engineering Project\n\nMain Menu"
-            print "1.\tClusters\n2.\tRun task\n0.\tExit"
+            print "\nWelcome to the Service Engineering Project\n\nMain Menu"
+            print "1.\tManage Clusters\n2.\tRun task\n0.\tExit"
 
             ops = {'1': 'self.cluster_handler.menu()',
                    '2': 'self.run_simple_flow()'}
